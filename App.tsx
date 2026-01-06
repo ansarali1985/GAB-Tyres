@@ -1,0 +1,107 @@
+
+import React from 'react';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider, useApp } from './AppContext';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Brands from './pages/Brands';
+import BrandDetail from './pages/BrandDetail';
+import Contact from './pages/Contact';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminBrands from './pages/AdminBrands';
+import AdminServices from './pages/AdminServices';
+import AdminSettings from './pages/AdminSettings';
+
+const Footer: React.FC = () => {
+  const { settings } = useApp();
+  
+  return (
+    <footer className="bg-gray-900 text-gray-400 py-16 px-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="col-span-1 md:col-span-2">
+          <div className="flex items-center space-x-2 mb-6">
+            <div className="bg-blue-600 text-white p-1 rounded font-bold text-xl">GAB</div>
+            <span className="text-white text-xl font-black">{settings.businessName.split(' ')[1] || 'Tyres'}</span>
+          </div>
+          <p className="max-w-sm mb-8 leading-relaxed">
+            {settings.footerDescription}
+          </p>
+          <div className="flex space-x-4">
+            {settings.footerSocials.map(s => (
+              <a 
+                key={s.id} 
+                href={s.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
+              >
+                {s.platform}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Quick Links</h4>
+          <ul className="space-y-4">
+            {settings.footerQuickLinks.map(link => (
+              <li key={link.id}>
+                <a href={link.url} className="hover:text-blue-500 transition-colors">{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Business Hours</h4>
+          <ul className="space-y-4 text-sm">
+            {settings.footerBusinessHours.map(hour => (
+              <li key={hour.id} className="flex justify-between">
+                <span>{hour.day}</span> 
+                <span className={hour.hours.toLowerCase().includes('closed') ? 'text-red-400' : 'text-white'}>
+                  {hour.hours}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-gray-800 text-center text-xs opacity-50">
+        &copy; {new Date().getFullYear()} {settings.businessName}. All rights reserved. Professional Grade Tyre Retail.
+      </div>
+    </footer>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AppProvider>
+      <Router>
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-200 selection:text-blue-900">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/brands" element={<Brands />} />
+              <Route path="/brands/:brandId" element={<BrandDetail />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              
+              {/* Admin Protected Routes */}
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/brands" element={<AdminBrands />} />
+              <Route path="/admin/services" element={<AdminServices />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+
+              {/* Catch all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </AppProvider>
+  );
+};
+
+export default App;
