@@ -1,14 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../AppContext';
 import { ThemeType, FooterLink, BusinessHour, SocialLink } from '../types';
-import { Save, User, Shield, Phone, MapPin, Palette, CheckCircle, Globe, Clock, Share2, Plus, Trash2, Layout, Eye, EyeOff, Image as ImageIcon, Type } from 'lucide-react';
+import { Save, User, Shield, Phone, MapPin, Palette, CheckCircle, Layout, Eye, EyeOff, Upload, Image as ImageIcon, Type, Mail } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 const AdminSettings: React.FC = () => {
   const { isAdmin, settings, setSettings } = useApp();
   const [formData, setFormData] = useState({...settings});
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isAdmin) return <Navigate to="/admin/login" replace />;
 
@@ -17,6 +18,17 @@ const AdminSettings: React.FC = () => {
     setSettings(formData);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
+  };
+
+  const handleHeroUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, homeHeroImage: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const addItem = (key: 'footerQuickLinks' | 'footerBusinessHours' | 'footerSocials') => {
@@ -45,18 +57,16 @@ const AdminSettings: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12">
         <h1 className="text-4xl font-black text-gray-900">System Settings</h1>
-        <p className="text-gray-500 font-medium">Configure visuals, dashboard content, and security</p>
+        <p className="text-gray-500 font-medium">Manage your dashboard visuals, text content, and security</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-10">
         
         {/* Dashboard Content Management */}
         <section className="bg-white p-10 rounded-[40px] shadow-xl border border-gray-100">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-3">
-              <Layout className="text-orange-500" size={24} />
-              <h2 className="text-2xl font-bold text-gray-900">Dashboard Content & Layout</h2>
-            </div>
+          <div className="flex items-center space-x-3 mb-8">
+            <Layout className="text-orange-500" size={24} />
+            <h2 className="text-2xl font-bold text-gray-900">Dashboard Layout & Content</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
@@ -83,51 +93,62 @@ const AdminSettings: React.FC = () => {
               </div>
             </div>
 
-            {/* Hero Image */}
+            {/* Hero Image Upload */}
             <div>
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Main Dashboard Car/Hero Image</label>
-              <div className="space-y-3">
-                <div className="relative">
-                  <ImageIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input 
-                    type="text"
-                    className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-orange-500 transition-all text-sm text-slate-900"
-                    placeholder="Hero Image URL..."
-                    value={formData.homeHeroImage}
-                    onChange={(e) => setFormData({...formData, homeHeroImage: e.target.value})}
-                  />
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Main Dashboard Banner (Upload)</label>
+              <div className="space-y-4">
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group relative h-48 rounded-3xl overflow-hidden border-4 border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:border-orange-400 transition-all"
+                >
+                  {formData.homeHeroImage ? (
+                    <>
+                      <img src={formData.homeHeroImage} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" alt="Hero Preview" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-orange-600 font-black">
+                        <Upload size={32} className="mb-2" />
+                        <span>Change Image</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center text-gray-400">
+                      <Upload size={32} className="mx-auto mb-2" />
+                      <span className="font-bold">Click to Upload Hero Image</span>
+                    </div>
+                  )}
+                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleHeroUpload} />
                 </div>
-                <div className="h-40 rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
-                  <img src={formData.homeHeroImage} className="w-full h-full object-cover" alt="Hero Preview" />
-                </div>
+                <p className="text-[10px] text-gray-400 italic">Recommended: Landscape orientation (16:9 or 21:9) for best appearance.</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-8">
-            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Text Content & Placement</h3>
+            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center space-x-2">
+              <Type size={16} />
+              <span>Editable Dashboard Text</span>
+            </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Hero Title</label>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Hero Main Title</label>
                 <input 
                   type="text"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-bold"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-black text-xl"
                   value={formData.homeHeroTitle}
                   onChange={(e) => setFormData({...formData, homeHeroTitle: e.target.value})}
                 />
               </div>
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Hero Subtitle</label>
-                <input 
-                  type="text"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900"
+                <textarea 
+                  rows={2}
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-medium"
                   value={formData.homeHeroSubtitle}
                   onChange={(e) => setFormData({...formData, homeHeroSubtitle: e.target.value})}
-                />
+                ></textarea>
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Brands Section Title</label>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Brands Section Heading</label>
                 <input 
                   type="text"
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-bold"
@@ -136,7 +157,7 @@ const AdminSettings: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Services Section Title</label>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Services Section Heading</label>
                 <input 
                   type="text"
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-bold"
@@ -145,7 +166,7 @@ const AdminSettings: React.FC = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Services Subtitle</label>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Services Section Subtitle</label>
                 <textarea 
                   rows={2}
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900"
@@ -193,37 +214,84 @@ const AdminSettings: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900">Business Profile</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <input 
-              className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none text-slate-900 font-bold"
-              placeholder="Business Name"
-              value={formData.businessName}
-              onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-            />
-            <input 
-              className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none text-slate-900 font-bold"
-              placeholder="Business Email"
-              value={formData.businessEmail}
-              onChange={(e) => setFormData({...formData, businessEmail: e.target.value})}
-            />
-            <input 
-              className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none text-slate-900 font-bold"
-              placeholder="WhatsApp"
-              value={formData.whatsappNumber}
-              onChange={(e) => setFormData({...formData, whatsappNumber: e.target.value})}
-            />
-            <input 
-              className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none text-slate-900 font-bold"
-              placeholder="Phone Call"
-              value={formData.phoneNumber}
-              onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-            />
-            <textarea 
-              className="md:col-span-2 w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none text-slate-900"
-              placeholder="Address"
-              rows={2}
-              value={formData.businessAddress}
-              onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}
-            />
+            <div className="relative">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Business Name</label>
+              <input 
+                className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
+                value={formData.businessName}
+                onChange={(e) => setFormData({...formData, businessName: e.target.value})}
+              />
+            </div>
+            <div className="relative">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Public Email</label>
+              <div className="relative">
+                <Mail className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <input 
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
+                  value={formData.businessEmail}
+                  onChange={(e) => setFormData({...formData, businessEmail: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="relative">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">WhatsApp Number</label>
+              <input 
+                className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
+                value={formData.whatsappNumber}
+                onChange={(e) => setFormData({...formData, whatsappNumber: e.target.value})}
+              />
+            </div>
+            <div className="relative">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Direct Call Number</label>
+              <input 
+                className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Store Address</label>
+              <textarea 
+                className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900"
+                rows={2}
+                value={formData.businessAddress}
+                onChange={(e) => setFormData({...formData, businessAddress: e.target.value})}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Security / Admin Credentials */}
+        <section className="bg-white p-10 rounded-[40px] shadow-xl border border-gray-100">
+          <div className="flex items-center space-x-3 mb-8">
+            <Shield className="text-red-500" size={24} />
+            <h2 className="text-2xl font-bold text-gray-900">Admin Security</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Login Username</label>
+              <div className="relative">
+                <User className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input 
+                  type="text"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-red-500 transition-all font-bold text-slate-900"
+                  value={formData.adminUsername}
+                  onChange={(e) => setFormData({...formData, adminUsername: e.target.value})}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Login Password</label>
+              <div className="relative">
+                <Shield className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input 
+                  type="text"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-red-500 transition-all font-bold text-slate-900"
+                  value={formData.adminPassword}
+                  onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
+                />
+              </div>
+            </div>
           </div>
         </section>
 
