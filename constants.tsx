@@ -1,4 +1,3 @@
-
 import { ThemeType, TyreBrand, ServiceItem, AppSettings, SizeFinance } from './types';
 
 export const ALL_TYRE_SIZES = [
@@ -57,7 +56,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showServices: true,
   showTrust: true,
   // Footer
-  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010.',
+  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010. Your safety is our number one priority.',
   footerQuickLinks: [
     { id: '1', label: 'About Us', url: '#' },
     { id: '2', label: 'Tyre Care Tips', url: '#' },
