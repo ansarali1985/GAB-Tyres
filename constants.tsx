@@ -1,3 +1,4 @@
+
 import { ThemeType, TyreBrand, ServiceItem, AppSettings, SizeFinance } from './types';
 
 export const ALL_TYRE_SIZES = [
@@ -7,12 +8,6 @@ export const ALL_TYRE_SIZES = [
   "225/40 R18", "225/45 R18", "235/40 R18", "245/40 R18", "245/45 R18",
   "255/35 R19", "255/40 R19", "255/50 R19", "265/35 R19", "275/40 R20"
 ];
-
-const createDefaultSizeFinance = (): SizeFinance => ({
-  salePrice: 0,
-  purchasePrice: 0,
-  otherExpenses: 0
-});
 
 export const INITIAL_BRANDS: TyreBrand[] = [
   { 
@@ -26,17 +21,7 @@ export const INITIAL_BRANDS: TyreBrand[] = [
       [ALL_TYRE_SIZES[6]]: { salePrice: 18500, purchasePrice: 15000, otherExpenses: 700 },
     }
   },
-  { 
-    id: '2', 
-    name: 'Yokohama', 
-    image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', 
-    description: 'Japanese precision engineered for maximum grip.', 
-    availableSizes: [ALL_TYRE_SIZES[1], ALL_TYRE_SIZES[7]],
-    sizeData: {
-      [ALL_TYRE_SIZES[1]]: { salePrice: 11000, purchasePrice: 8500, otherExpenses: 400 },
-      [ALL_TYRE_SIZES[7]]: { salePrice: 16000, purchasePrice: 13000, otherExpenses: 600 },
-    }
-  },
+  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availableSizes: [ALL_TYRE_SIZES[1], ALL_TYRE_SIZES[7]], sizeData: {} },
   { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availableSizes: [ALL_TYRE_SIZES[2], ALL_TYRE_SIZES[8]], sizeData: {} },
   { id: '4', name: 'BF Goodrich', image: 'https://images.unsplash.com/photo-1551522435-a13afa10f103?auto=format&fit=crop&q=80&w=400', description: 'Tough, dependable tyres for the most demanding off-road trails.', availableSizes: [ALL_TYRE_SIZES[3], ALL_TYRE_SIZES[9]], sizeData: {} },
   { id: '5', name: 'TrackMax', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=400', description: 'Uncompromising performance for the serious track enthusiast.', availableSizes: [ALL_TYRE_SIZES[4], ALL_TYRE_SIZES[10]], sizeData: {} },
@@ -46,7 +31,7 @@ export const INITIAL_BRANDS: TyreBrand[] = [
 
 export const INITIAL_SERVICES: ServiceItem[] = [
   { id: 's1', name: 'Tyre Repair', description: 'Expert puncture repair using industry-standard vulcanization.', price: 1500, icon: '🔧' },
-  { id: 's2', name: 'Wheel Alignment', description: 'State-of-the-art 3D laser alignment for perfect handling.', price: 3500, icon: '📏' },
+  { id: 's2', name: 'Wheel Alignment', description: 'State-of-the-art 3D laser alignment for perfect handling.', price: 3500, icon: '📏', image: 'https://images.unsplash.com/photo-1625047509168-a7026f36de04?auto=format&fit=crop&q=80&w=400' },
   { id: 's3', name: 'Wheel Balancing', description: 'Precision electronic balancing to eliminate vibrations.', price: 2000, icon: '⚖️' },
   { id: 's4', name: 'Nitrogen Filling', description: 'Keep your tyres cool and pressure consistent with Nitrogen.', price: 1000, icon: '💨' },
 ];
@@ -54,13 +39,25 @@ export const INITIAL_SERVICES: ServiceItem[] = [
 export const DEFAULT_SETTINGS: AppSettings = {
   whatsappNumber: '923001234567',
   phoneNumber: '923001234567',
-  businessEmail: 'info@gabtyres.com', // Default editable email
+  businessEmail: 'info@gabtyres.com',
   theme: ThemeType.DEFAULT,
   adminUsername: 'Ansar',
   adminPassword: 'Anudada@007',
   businessName: 'GAB Tyres',
   businessAddress: 'Plot 42, Main Commercial Area, Phase 2, Industrial Estate',
-  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010. Your safety is our number one priority.',
+  // Dashboard Defaults
+  homeHeroImage: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800',
+  homeHeroTitle: 'Performance Starts From The Ground Up.',
+  homeHeroSubtitle: 'The most trusted tyre specialists in the region. Explore high-performance brands and precision services.',
+  homeBrandsTitle: 'Featured Brands',
+  homeServicesTitle: 'Expert Service Center',
+  homeServicesSubtitle: 'Our workshop is equipped with the latest diagnostic tools to ensure your vehicle stays safe and balanced.',
+  showHero: true,
+  showBrands: true,
+  showServices: true,
+  showTrust: true,
+  // Footer
+  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010.',
   footerQuickLinks: [
     { id: '1', label: 'About Us', url: '#' },
     { id: '2', label: 'Tyre Care Tips', url: '#' },
@@ -75,8 +72,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   footerSocials: [
     { id: '1', platform: 'FB', url: 'https://facebook.com' },
     { id: '2', platform: 'IG', url: 'https://instagram.com' },
-    { id: '3', platform: 'TW', url: 'https://twitter.com' },
-    { id: '4', platform: 'LI', url: 'https://linkedin.com' },
   ]
 };
 
