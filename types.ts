@@ -1,3 +1,4 @@
+
 export enum ThemeType {
   DEFAULT = 'DEFAULT',
   DARK = 'DARK',
@@ -36,7 +37,7 @@ export interface TyreBrand {
   image: string;
   description: string;
   availableSizes: string[];
-  sizeData: Record<string, SizeFinance>; // Map size string to financial data
+  sizeData: Record<string, SizeFinance>;
 }
 
 export interface ServiceItem {
@@ -45,17 +46,31 @@ export interface ServiceItem {
   description: string;
   price: number;
   icon: string;
+  image?: string; // Optional image to replace emoji
 }
 
 export interface AppSettings {
   whatsappNumber: string;
-  phoneNumber: string; // Added for Call Now
-  businessEmail: string; // Added to make email editable
+  phoneNumber: string;
+  businessEmail: string;
   theme: ThemeType;
   adminUsername: string;
   adminPassword: string;
   businessName: string;
   businessAddress: string;
+  // Dashboard Editable Content
+  homeHeroImage: string;
+  homeHeroTitle: string;
+  homeHeroSubtitle: string;
+  homeBrandsTitle: string;
+  homeServicesTitle: string;
+  homeServicesSubtitle: string;
+  // Layout Management
+  showHero: boolean;
+  showBrands: boolean;
+  showServices: boolean;
+  showTrust: boolean;
+  // Footer
   footerDescription: string;
   footerQuickLinks: FooterLink[];
   footerBusinessHours: BusinessHour[];
