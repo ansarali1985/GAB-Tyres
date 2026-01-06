@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useApp } from '../AppContext';
 import { ThemeType, FooterLink, BusinessHour, SocialLink } from '../types';
@@ -57,7 +56,7 @@ const AdminSettings: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12">
         <h1 className="text-4xl font-black text-gray-900">System Settings</h1>
-        <p className="text-gray-500 font-medium">Manage your dashboard visuals, text content, and security</p>
+        <p className="text-gray-500 font-medium">Manage your dashboard visuals, text descriptions, and security</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-10">
@@ -106,7 +105,7 @@ const AdminSettings: React.FC = () => {
                       <img src={formData.homeHeroImage} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" alt="Hero Preview" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-orange-600 font-black">
                         <Upload size={32} className="mb-2" />
-                        <span>Change Image</span>
+                        <span>Change Dashboard Image</span>
                       </div>
                     </>
                   ) : (
@@ -117,7 +116,7 @@ const AdminSettings: React.FC = () => {
                   )}
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleHeroUpload} />
                 </div>
-                <p className="text-[10px] text-gray-400 italic">Recommended: Landscape orientation (16:9 or 21:9) for best appearance.</p>
+                <p className="text-[10px] text-gray-400 italic text-center">Recommended: Professional automotive photography (16:9 aspect ratio).</p>
               </div>
             </div>
           </div>
@@ -125,7 +124,7 @@ const AdminSettings: React.FC = () => {
           <div className="space-y-8">
             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center space-x-2">
               <Type size={16} />
-              <span>Editable Dashboard Text</span>
+              <span>Editable Dashboard Text Content</span>
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,7 +138,7 @@ const AdminSettings: React.FC = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Hero Subtitle</label>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Hero Description Subtitle</label>
                 <textarea 
                   rows={2}
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900 font-medium"
@@ -166,7 +165,7 @@ const AdminSettings: React.FC = () => {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Services Section Subtitle</label>
+                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Workshop / Services Description</label>
                 <textarea 
                   rows={2}
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-orange-500 text-slate-900"
@@ -178,11 +177,11 @@ const AdminSettings: React.FC = () => {
           </div>
         </section>
 
-        {/* Previous Sections Restored / Maintained */}
+        {/* Theme Settings */}
         <section className="bg-white p-10 rounded-[40px] shadow-xl border border-gray-100">
           <div className="flex items-center space-x-3 mb-8">
             <Palette className="text-purple-500" size={24} />
-            <h2 className="text-2xl font-bold text-gray-900">Application Theme</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Application Branding & Theme</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -214,7 +213,7 @@ const AdminSettings: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900">Business Profile</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="relative">
+            <div>
               <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Business Name</label>
               <input 
                 className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
@@ -222,8 +221,8 @@ const AdminSettings: React.FC = () => {
                 onChange={(e) => setFormData({...formData, businessName: e.target.value})}
               />
             </div>
-            <div className="relative">
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Public Email</label>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Business Email</label>
               <div className="relative">
                 <Mail className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 <input 
@@ -233,16 +232,16 @@ const AdminSettings: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="relative">
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">WhatsApp Number</label>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">WhatsApp Order Line</label>
               <input 
                 className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
                 value={formData.whatsappNumber}
                 onChange={(e) => setFormData({...formData, whatsappNumber: e.target.value})}
               />
             </div>
-            <div className="relative">
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Direct Call Number</label>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Direct Call Line</label>
               <input 
                 className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900 font-bold"
                 value={formData.phoneNumber}
@@ -250,7 +249,7 @@ const AdminSettings: React.FC = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Store Address</label>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Showroom Address</label>
               <textarea 
                 className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 text-slate-900"
                 rows={2}
@@ -261,52 +260,18 @@ const AdminSettings: React.FC = () => {
           </div>
         </section>
 
-        {/* Security / Admin Credentials */}
-        <section className="bg-white p-10 rounded-[40px] shadow-xl border border-gray-100">
-          <div className="flex items-center space-x-3 mb-8">
-            <Shield className="text-red-500" size={24} />
-            <h2 className="text-2xl font-bold text-gray-900">Admin Security</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Login Username</label>
-              <div className="relative">
-                <User className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input 
-                  type="text"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-red-500 transition-all font-bold text-slate-900"
-                  value={formData.adminUsername}
-                  onChange={(e) => setFormData({...formData, adminUsername: e.target.value})}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Login Password</label>
-              <div className="relative">
-                <Shield className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input 
-                  type="text"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-red-500 transition-all font-bold text-slate-900"
-                  value={formData.adminPassword}
-                  onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Floating Save Button */}
         <div className="sticky bottom-8 z-20 flex justify-center">
           <button type="submit" className="bg-black text-white px-12 py-5 rounded-2xl font-black text-xl shadow-2xl hover:scale-105 transition-all flex items-center space-x-3">
             {saveSuccess ? (
               <>
                 <CheckCircle size={24} className="text-green-400" />
-                <span>Settings Saved!</span>
+                <span>All Changes Published!</span>
               </>
             ) : (
               <>
                 <Save size={24} />
-                <span>Save All Updates</span>
+                <span>Save All Site Settings</span>
               </>
             )}
           </button>
