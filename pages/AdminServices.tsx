@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../AppContext';
 import { ServiceItem } from '../types';
-import { Save, Trash2, Plus, Edit2, X } from 'lucide-react';
+import { Save, Trash2, Plus, Edit2, X, Image as ImageIcon } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 const AdminServices: React.FC = () => {
@@ -13,7 +13,8 @@ const AdminServices: React.FC = () => {
     name: '',
     description: '',
     price: 0,
-    icon: '🔧'
+    icon: '🔧',
+    image: ''
   });
 
   if (!isAdmin) return <Navigate to="/admin/login" replace />;
@@ -29,11 +30,12 @@ const AdminServices: React.FC = () => {
         name: newService.name!,
         description: newService.description || '',
         price: newService.price || 0,
-        icon: newService.icon || '🔧'
+        icon: newService.icon || '🔧',
+        image: newService.image
       };
       setServices([...services, service]);
       setIsAdding(false);
-      setNewService({ name: '', description: '', price: 0, icon: '🔧' });
+      setNewService({ name: '', description: '', price: 0, icon: '🔧', image: '' });
     }
   };
 
@@ -98,22 +100,35 @@ const AdminServices: React.FC = () => {
                 onChange={(e) => isAdding ? setNewService({...newService, icon: e.target.value}) : setEditingService({...editingService!, icon: e.target.value})}
               />
             </div>
-            <div className="flex items-end">
-              <button 
-                onClick={handleSave}
-                className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all"
-              >
-                <Save size={20} />
-                <span>Save</span>
-              </button>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Service Photo URL (Optional)</label>
+              <div className="relative">
+                <ImageIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input 
+                  type="text"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-emerald-500 transition-all text-sm text-slate-900"
+                  placeholder="Paste URL..."
+                  value={isAdding ? newService.image : editingService?.image}
+                  onChange={(e) => isAdding ? setNewService({...newService, image: e.target.value}) : setEditingService({...editingService!, image: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="md:col-span-4">
+            <div className="md:col-span-3">
               <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Description</label>
               <textarea 
                 className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 focus:outline-none focus:border-emerald-500 transition-all text-slate-900"
                 value={isAdding ? newService.description : editingService?.description}
                 onChange={(e) => isAdding ? setNewService({...newService, description: e.target.value}) : setEditingService({...editingService!, description: e.target.value})}
               ></textarea>
+            </div>
+            <div className="flex items-end">
+              <button 
+                onClick={handleSave}
+                className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-xl hover:bg-emerald-700 transition-all"
+              >
+                <Save size={20} />
+                <span>Save Service</span>
+              </button>
             </div>
           </div>
         </div>
@@ -125,7 +140,6 @@ const AdminServices: React.FC = () => {
             <tr>
               <th className="px-10 py-6 text-xs font-black text-gray-400 uppercase tracking-widest">Service</th>
               <th className="px-10 py-6 text-xs font-black text-gray-400 uppercase tracking-widest">Rate</th>
-              <th className="px-10 py-6 text-xs font-black text-gray-400 uppercase tracking-widest">Description</th>
               <th className="px-10 py-6 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
             </tr>
           </thead>
@@ -134,30 +148,26 @@ const AdminServices: React.FC = () => {
               <tr key={service.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="px-10 py-8">
                   <div className="flex items-center space-x-4">
-                    <span className="text-3xl">{service.icon}</span>
-                    <span className="font-bold text-gray-900 text-lg">{service.name}</span>
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
+                      {service.image ? (
+                        <img src={service.image} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xl">{service.icon}</span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="font-bold text-gray-900 text-lg block">{service.name}</span>
+                      <span className="text-xs text-gray-400 truncate max-w-xs block">{service.description}</span>
+                    </div>
                   </div>
                 </td>
                 <td className="px-10 py-8">
                   <span className="text-2xl font-black text-emerald-600">Rs. {service.price}</span>
                 </td>
-                <td className="px-10 py-8 text-gray-500 max-w-md truncate">
-                  {service.description}
-                </td>
                 <td className="px-10 py-8 text-right">
                   <div className="flex justify-end space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={() => setEditingService({...service})}
-                      className="p-3 bg-white text-gray-600 rounded-xl border border-gray-200 hover:border-emerald-400 hover:text-emerald-600 transition-all"
-                    >
-                      <Edit2 size={18} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(service.id)}
-                      className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 hover:bg-red-100 transition-all"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <button onClick={() => setEditingService({...service})} className="p-3 bg-white text-gray-600 rounded-xl border border-gray-200 hover:text-emerald-600"><Edit2 size={18} /></button>
+                    <button onClick={() => handleDelete(service.id)} className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100"><Trash2 size={18} /></button>
                   </div>
                 </td>
               </tr>
