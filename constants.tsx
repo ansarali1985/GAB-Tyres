@@ -14,18 +14,18 @@ export const INITIAL_BRANDS: TyreBrand[] = [
     name: 'Michelin', 
     image: 'https://images.unsplash.com/photo-1578844541663-4711efaf3f1f?auto=format&fit=crop&q=80&w=400', 
     description: 'World-renowned for durability and high-end performance.', 
-    availableSizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[6]],
-    sizeData: {
+    availablesizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[6]],
+    sizedata: {
       [ALL_TYRE_SIZES[0]]: { salePrice: 12000, purchasePrice: 9500, otherExpenses: 500 },
       [ALL_TYRE_SIZES[6]]: { salePrice: 18500, purchasePrice: 15000, otherExpenses: 700 },
     }
   },
-  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availableSizes: [ALL_TYRE_SIZES[1], ALL_TYRE_SIZES[7]], sizeData: {} },
-  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availableSizes: [ALL_TYRE_SIZES[2], ALL_TYRE_SIZES[8]], sizeData: {} },
-  { id: '4', name: 'BF Goodrich', image: 'https://images.unsplash.com/photo-1551522435-a13afa10f103?auto=format&fit=crop&q=80&w=400', description: 'Tough, dependable tyres for the most demanding off-road trails.', availableSizes: [ALL_TYRE_SIZES[3], ALL_TYRE_SIZES[9]], sizeData: {} },
-  { id: '5', name: 'TrackMax', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=400', description: 'Uncompromising performance for the serious track enthusiast.', availableSizes: [ALL_TYRE_SIZES[4], ALL_TYRE_SIZES[10]], sizeData: {} },
-  { id: '6', name: 'Nankang', image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&q=80&w=400', description: 'Quality engineering meets exceptional value for daily driving.', availableSizes: [ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[11]], sizeData: {} },
-  { id: '7', name: 'GT Radial', image: 'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?auto=format&fit=crop&q=80&w=400', description: 'Exceptional control, comfort, and stability for any passenger car.', availableSizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[10]], sizeData: {} },
+  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availablesizes: [ALL_TYRE_SIZES[1], ALL_TYRE_SIZES[7]], sizedata: {} },
+  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availablesizes: [ALL_TYRE_SIZES[2], ALL_TYRE_SIZES[8]], sizedata: {} },
+  { id: '4', name: 'BF Goodrich', image: 'https://images.unsplash.com/photo-1551522435-a13afa10f103?auto=format&fit=crop&q=80&w=400', description: 'Tough, dependable tyres for the most demanding off-road trails.', availablesizes: [ALL_TYRE_SIZES[3], ALL_TYRE_SIZES[9]], sizedata: {} },
+  { id: '5', name: 'TrackMax', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=400', description: 'Uncompromising performance for the serious track enthusiast.', availablesizes: [ALL_TYRE_SIZES[4], ALL_TYRE_SIZES[10]], sizedata: {} },
+  { id: '6', name: 'Nankang', image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&q=80&w=400', description: 'Quality engineering meets exceptional value for daily driving.', availablesizes: [ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[11]], sizedata: {} },
+  { id: '7', name: 'GT Radial', image: 'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?auto=format&fit=crop&q=80&w=400', description: 'Exceptional control, comfort, and stability for any passenger car.', availablesizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[10]], sizedata: {} },
 ];
 
 export const INITIAL_SERVICES: ServiceItem[] = [
