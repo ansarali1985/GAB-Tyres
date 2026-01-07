@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TyreBrand, ServiceItem, AppSettings, ThemeType } from './types';
 import { INITIAL_BRANDS, INITIAL_SERVICES, DEFAULT_SETTINGS } from './constants';
@@ -20,6 +19,65 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+/* ------------------------
+   Helper mappers (deep)
+   ------------------------ */
+
+const isPlainObject = (v: any) =>
+  v !== null && typeof v === 'object' && !Array.isArray(v);
+
+const toSnakeKey = (s: string) =>
+  s.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase());
+
+const toCamelKey = (s: string) =>
+  s.replace(/_([a-z0-9])/g, (_, c) => (c ? c.toUpperCase() : ''));
+
+/**
+ * toSnake - deep convert object keys from camelCase to snake_case
+ */
+const toSnake = (input: any): any => {
+  if (Array.isArray(input)) return input.map(toSnake);
+  if (!isPlainObject(input)) return input;
+  const out: Record<string, any> = {};
+  for (const key of Object.keys(input)) {
+    const val = (input as any)[key];
+    const newKey = toSnakeKey(key);
+    if (Array.isArray(val)) {
+      out[newKey] = val.map((v) => (isPlainObject(v) || Array.isArray(v) ? toSnake(v) : v));
+    } else if (isPlainObject(val)) {
+      out[newKey] = toSnake(val);
+    } else {
+      out[newKey] = val;
+    }
+  }
+  return out;
+};
+
+/**
+ * toCamel - deep convert object keys from snake_case to camelCase
+ */
+const toCamel = (input: any): any => {
+  if (Array.isArray(input)) return input.map(toCamel);
+  if (!isPlainObject(input)) return input;
+  const out: Record<string, any> = {};
+  for (const key of Object.keys(input)) {
+    const val = (input as any)[key];
+    const newKey = toCamelKey(key);
+    if (Array.isArray(val)) {
+      out[newKey] = val.map((v) => (isPlainObject(v) || Array.isArray(v) ? toCamel(v) : v));
+    } else if (isPlainObject(val)) {
+      out[newKey] = toCamel(val);
+    } else {
+      out[newKey] = val;
+    }
+  }
+  return out;
+};
+
+/* ------------------------
+   AppProvider
+   ------------------------ */
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [brands, setBrands] = useState<TyreBrand[]>(INITIAL_BRANDS);
   const [services, setServices] = useState<ServiceItem[]>(INITIAL_SERVICES);
@@ -35,29 +93,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       try {
         if (supabase) {
-          // Fetch from Supabase
+          // Fetch from Supabase (request snake_case columns explicitly)
           const [brandsRes, servicesRes, settingsRes] = await Promise.all([
-            supabase.from('brands').select('*'),
-            supabase.from('services').select('*'),
-            supabase.from('settings').select('*').maybeSingle()
+            supabase.from('brands').select('id, name, image, description, availablesizes, sizedata'),
+            supabase.from('services').select('id, name, description, price, icon, image'),
+            supabase.from('settings').select('id, whatsappnumber, phonenumber, businessemail, theme, adminusername, adminpassword, businessname, businessaddress, homeheroimage, homeherotitle, homeherosubtitle, homebrandstitle, homeservicestitle, homeservicessubtitle, showhero, showbrands, showservices, showtrust, footerdescription, footerquicklinks, footerbusinesshours, footersocials').maybeSingle()
           ]);
 
           if (brandsRes.error) console.error("Cloud Brands Error:", brandsRes.error.message);
           if (servicesRes.error) console.error("Cloud Services Error:", servicesRes.error.message);
+          if (settingsRes.error) console.error("Cloud Settings Error:", settingsRes.error.message);
 
           // Only use cloud data if it actually exists in the database
           let cloudDataFound = false;
 
           if (brandsRes.data && brandsRes.data.length > 0) {
-            setBrands(brandsRes.data);
+            // Convert incoming snake_case -> camelCase
+            setBrands((brandsRes.data as any[]).map(toCamel));
             cloudDataFound = true;
           }
           if (servicesRes.data && servicesRes.data.length > 0) {
-            setServices(servicesRes.data);
+            setServices((servicesRes.data as any[]).map(toCamel));
             cloudDataFound = true;
           }
           if (settingsRes.data) {
-            setSettings(settingsRes.data);
+            setSettings(toCamel(settingsRes.data));
             cloudDataFound = true;
           }
 
@@ -107,7 +167,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const syncToCloud = async () => {
     if (!supabase) {
-      alert("Cloud database not connected. Check Vercel environment variables.");
+      alert("Cloud database not connected. Check environment variables.");
       return;
     }
 
@@ -115,25 +175,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       console.log("Starting Global Sync...");
       
       // 1. Sync Brands
+      // Convert outgoing payloads to snake_case
+      const brandsSnake = brands.map(toSnake);
       const { error: bDelErr } = await supabase.from('brands').delete().neq('id', '0');
       if (bDelErr) throw new Error("Brands Delete Failed: " + bDelErr.message);
-      const { error: bInsErr } = await supabase.from('brands').insert(brands);
+      const { error: bInsErr } = await supabase.from('brands').insert(brandsSnake);
       if (bInsErr) throw new Error("Brands Insert Failed: " + bInsErr.message);
 
       // 2. Sync Services
+      const servicesSnake = services.map(toSnake);
       const { error: sDelErr } = await supabase.from('services').delete().neq('id', '0');
       if (sDelErr) throw new Error("Services Delete Failed: " + sDelErr.message);
-      const { error: sInsErr } = await supabase.from('services').insert(services);
+      const { error: sInsErr } = await supabase.from('services').insert(servicesSnake);
       if (sInsErr) throw new Error("Services Insert Failed: " + sInsErr.message);
 
       // 3. Sync Settings
-      const { error: setErr } = await supabase.from('settings').upsert({ id: 1, ...settings });
+      const settingsSnake = toSnake({ id: 1, ...settings });
+      const { error: setErr } = await supabase.from('settings').upsert(settingsSnake);
       if (setErr) throw new Error("Settings Sync Failed: " + setErr.message);
       
       alert("GLOBAL UPDATE LIVE! Every device worldwide now sees your latest changes.");
     } catch (e: any) {
       console.error("Sync Error:", e);
-      alert("Update Failed: " + e.message + "\n\nMake sure you disabled RLS in Supabase SQL Editor.");
+      alert("Update Failed: " + e.message + "\n\nMake sure you disabled RLS in Supabase SQL Editor or configured appropriate policies.");
     }
   };
 
