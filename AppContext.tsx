@@ -93,7 +93,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       try {
         if (supabase) {
-          // Fetch from Supabase (request snake_case columns explicitly)
+          // Fetch from Supabase (use exact DB column names)
           const [brandsRes, servicesRes, settingsRes] = await Promise.all([
             supabase.from('brands').select('id, name, image, description, availablesizes, sizedata'),
             supabase.from('services').select('id, name, description, price, icon, image'),
