@@ -2,25 +2,25 @@
 import React from 'react';
 import { useApp } from '../AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Tag, Wrench, Settings, LogOut, ChevronRight, Package, Users, DollarSign, Calculator, TrendingUp, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, Tag, Wrench, Settings, LogOut, ChevronRight, Package, Calculator, TrendingUp, AlertTriangle, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const AdminDashboard: React.FC = () => {
-  const { isAdmin, logout, brands, services } = useApp();
+  const { isAdmin, logout, brands, services, syncToCloud } = useApp();
   const navigate = useNavigate();
 
   if (!isAdmin) return <Navigate to="/admin/login" replace />;
 
-  // Financial Calculations for Profitability Report
   let totalPotentialRevenue = 0;
   let totalPurchaseCost = 0;
   let totalOtherExpenses = 0;
   let totalActiveSizes = 0;
 
   brands.forEach(brand => {
-    Object.values(brand.sizeData).forEach(finance => {
-      totalPotentialRevenue += finance.salePrice;
-      totalPurchaseCost += finance.purchasePrice;
-      totalOtherExpenses += finance.otherExpenses;
+    Object.values(brand.sizeData || {}).forEach(finance => {
+      totalPotentialRevenue += finance.salePrice || 0;
+      totalPurchaseCost += finance.purchasePrice || 0;
+      totalOtherExpenses += finance.otherExpenses || 0;
       totalActiveSizes++;
     });
   });
@@ -39,15 +39,33 @@ const AdminDashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4">
         <div>
           <h1 className="text-4xl font-black text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500 font-medium">Control center for GAB Tyres business performance</p>
+          <p className="text-gray-500 font-medium">Control center for GAB Tyres worldwide business</p>
         </div>
-        <button 
-          onClick={() => { logout(); navigate('/'); }}
-          className="flex items-center space-x-2 px-6 py-3 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 hover:bg-red-100 transition-all"
-        >
-          <LogOut size={20} />
-          <span>Exit Admin Mode</span>
-        </button>
+        
+        <div className="flex items-center space-x-3">
+          <div className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold ${supabase ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
+            {supabase ? <Cloud size={14} /> : <CloudOff size={14} />}
+            <span>{supabase ? 'Cloud Synchronized' : 'Offline Mode (Local Only)'}</span>
+          </div>
+          
+          {supabase && (
+            <button 
+              onClick={syncToCloud}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+            >
+              <RefreshCw size={20} />
+              <span>Push Global Update</span>
+            </button>
+          )}
+
+          <button 
+            onClick={() => { logout(); navigate('/'); }}
+            className="flex items-center space-x-2 px-6 py-3 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 hover:bg-red-100 transition-all"
+          >
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Overview */}
@@ -93,48 +111,6 @@ const AdminDashboard: React.FC = () => {
           <h3 className="text-3xl font-black text-gray-900">Rs. {netPotentialMargin.toLocaleString()}</h3>
         </div>
       </div>
-
-      {/* Profitability Report Section */}
-      <section className="bg-white rounded-[40px] shadow-2xl border border-gray-100 p-10 mb-12">
-        <div className="flex items-center space-x-3 mb-8">
-          <Calculator className="text-orange-500" size={28} />
-          <h2 className="text-2xl font-black text-gray-900">Brief Profitability Report</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-          <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-            <span className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">Total Potential Sale</span>
-            <span className="text-2xl font-black text-gray-900">Rs. {totalPotentialRevenue.toLocaleString()}</span>
-          </div>
-          <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-            <span className="text-xs font-black text-gray-400 uppercase tracking-widest block mb-2">Total Purchase Cost</span>
-            <span className="text-2xl font-black text-gray-900">Rs. {totalPurchaseCost.toLocaleString()}</span>
-          </div>
-          <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100">
-            <span className="text-xs font-black text-orange-400 uppercase tracking-widest block mb-2">Other Operational Expenses</span>
-            <span className="text-2xl font-black text-orange-900">Rs. {totalOtherExpenses.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center justify-between bg-emerald-900 rounded-[32px] p-10 text-white relative overflow-hidden">
-          <div className="relative z-10 text-center md:text-left mb-6 md:mb-0">
-            <h3 className="text-3xl font-black mb-2">Net Potential Profit</h3>
-            <p className="opacity-70 max-w-sm">Total margin after deducting purchase costs and operational expenses across all brands.</p>
-          </div>
-          <div className="relative z-10 text-center md:text-right">
-            <span className="text-5xl font-black block mb-2">Rs. {netPotentialMargin.toLocaleString()}</span>
-            <span className="text-sm font-bold bg-white/20 px-4 py-1.5 rounded-full">Avg. Rs. {Math.round(averageMarginPerUnit).toLocaleString()} / size</span>
-          </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl transform translate-x-32 -translate-y-32"></div>
-        </div>
-
-        {netPotentialMargin <= 0 && totalActiveSizes > 0 && (
-          <div className="mt-6 flex items-center space-x-3 text-red-600 bg-red-50 p-4 rounded-2xl border border-red-100">
-            <AlertTriangle size={20} />
-            <span className="text-sm font-bold">Warning: Your current pricing leads to a loss or zero profit. Please review Purchase vs Sale prices in Brand Management.</span>
-          </div>
-        )}
-      </section>
 
       <h2 className="text-2xl font-black text-gray-900 mb-8">Management Areas</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
