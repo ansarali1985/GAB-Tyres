@@ -26,22 +26,23 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const isPlainObject = (v: any) =>
   v !== null && typeof v === 'object' && !Array.isArray(v);
 
-const toSnakeKey = (s: string) =>
-  s.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase());
-
-const toCamelKey = (s: string) =>
-  s.replace(/_([a-z0-9])/g, (_, c) => (c ? c.toUpperCase() : ''));
-
-/**
- * toSnake - deep convert object keys from camelCase to snake_case
- */
 const toSnake = (input: any): any => {
   if (Array.isArray(input)) return input.map(toSnake);
   if (!isPlainObject(input)) return input;
+
   const out: Record<string, any> = {};
   for (const key of Object.keys(input)) {
     const val = (input as any)[key];
-    const newKey = toSnakeKey(key);
+
+    // map camelCase -> snake_case, with explicit overrides for DB column names
+    const newKey = ((): string => {
+      // explicit exceptions: map these camelCase keys to DB's exact names
+      if (key === 'availableSizes') return 'availablesizes';
+      if (key === 'sizeData') return 'sizedata';
+      // default conversion for all others
+      return key.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase());
+    })();
+
     if (Array.isArray(val)) {
       out[newKey] = val.map((v) => (isPlainObject(v) || Array.isArray(v) ? toSnake(v) : v));
     } else if (isPlainObject(val)) {
@@ -52,7 +53,6 @@ const toSnake = (input: any): any => {
   }
   return out;
 };
-
 /**
  * toCamel - deep convert object keys from snake_case to camelCase
  */
