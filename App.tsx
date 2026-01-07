@@ -12,6 +12,19 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminBrands from './pages/AdminBrands';
 import AdminServices from './pages/AdminServices';
 import AdminSettings from './pages/AdminSettings';
+import { RefreshCw } from 'lucide-react';
+
+const LoadingScreen: React.FC = () => (
+  <div className="fixed inset-0 bg-white z-[999] flex flex-col items-center justify-center">
+    <div className="bg-blue-600 p-4 rounded-3xl mb-8 animate-bounce shadow-2xl shadow-blue-200">
+      <span className="text-white font-black text-4xl">GAB</span>
+    </div>
+    <div className="flex items-center space-x-3 text-slate-400 font-bold">
+      <RefreshCw className="animate-spin" size={20} />
+      <span>Synchronizing worldwide data...</span>
+    </div>
+  </div>
+);
 
 const Footer: React.FC = () => {
   const { settings } = useApp();
@@ -72,34 +85,39 @@ const Footer: React.FC = () => {
   );
 };
 
+const AppContent: React.FC = () => {
+  const { isLoading } = useApp();
+  
+  if (isLoading) return <LoadingScreen />;
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-200 selection:text-blue-900">
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/brands" element={<Brands />} />
+            <Route path="/brands/:brandId" element={<BrandDetail />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/brands" element={<AdminBrands />} />
+            <Route path="/admin/services" element={<AdminServices />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
+  );
+};
+
 const App: React.FC = () => {
   return (
     <AppProvider>
-      <Router>
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-200 selection:text-blue-900">
-          <Navbar />
-          <main className="flex-1">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/brands" element={<Brands />} />
-              <Route path="/brands/:brandId" element={<BrandDetail />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              
-              {/* Admin Protected Routes */}
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/brands" element={<AdminBrands />} />
-              <Route path="/admin/services" element={<AdminServices />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-
-              {/* Catch all */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+      <AppContent />
     </AppProvider>
   );
 };
