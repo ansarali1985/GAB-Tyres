@@ -27,49 +27,75 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isAdmin, setIsAdmin] = useState<boolean>(() => sessionStorage.getItem('gab_isAdmin') === 'true');
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Initial Load from Cloud (Global) or Local (Backup)
+  // 1. Initial Load from Cloud (Global)
   useEffect(() => {
     const initData = async () => {
       setIsLoading(true);
+      console.log("Checking Cloud Connection...");
+      
       try {
         if (supabase) {
-          // Attempt to fetch from Supabase tables
-          const { data: cloudBrands } = await supabase.from('brands').select('*');
-          const { data: cloudServices } = await supabase.from('services').select('*');
-          const { data: cloudSettings } = await supabase.from('settings').select('*').single();
+          // Fetch from Supabase
+          const [brandsRes, servicesRes, settingsRes] = await Promise.all([
+            supabase.from('brands').select('*'),
+            supabase.from('services').select('*'),
+            supabase.from('settings').select('*').maybeSingle()
+          ]);
 
-          if (cloudBrands && cloudBrands.length > 0) setBrands(cloudBrands);
-          if (cloudServices && cloudServices.length > 0) setServices(cloudServices);
-          if (cloudSettings) setSettings(cloudSettings);
+          if (brandsRes.error) console.error("Cloud Brands Error:", brandsRes.error.message);
+          if (servicesRes.error) console.error("Cloud Services Error:", servicesRes.error.message);
+
+          // Only use cloud data if it actually exists in the database
+          let cloudDataFound = false;
+
+          if (brandsRes.data && brandsRes.data.length > 0) {
+            setBrands(brandsRes.data);
+            cloudDataFound = true;
+          }
+          if (servicesRes.data && servicesRes.data.length > 0) {
+            setServices(servicesRes.data);
+            cloudDataFound = true;
+          }
+          if (settingsRes.data) {
+            setSettings(settingsRes.data);
+            cloudDataFound = true;
+          }
+
+          if (cloudDataFound) {
+            console.log("Worldwide data synchronized successfully.");
+          } else {
+            console.log("Cloud is empty. Using default local version.");
+            loadFromLocal();
+          }
         } else {
-          // Fallback to LocalStorage if Supabase isn't configured yet
-          const savedBrands = localStorage.getItem('gab_brands');
-          const savedServices = localStorage.getItem('gab_services');
-          const savedSettings = localStorage.getItem('gab_settings');
-          
-          if (savedBrands) setBrands(JSON.parse(savedBrands));
-          if (savedServices) setServices(JSON.parse(savedServices));
-          if (savedSettings) setSettings(JSON.parse(savedSettings));
+          console.warn("Supabase not configured. Using local fallback.");
+          loadFromLocal();
         }
       } catch (error) {
-        console.error("Data fetch error:", error);
+        console.error("Critical Sync Error:", error);
+        loadFromLocal();
       } finally {
         setIsLoading(false);
       }
     };
 
+    const loadFromLocal = () => {
+      const savedBrands = localStorage.getItem('gab_brands');
+      const savedServices = localStorage.getItem('gab_services');
+      const savedSettings = localStorage.getItem('gab_settings');
+      
+      if (savedBrands) setBrands(JSON.parse(savedBrands));
+      if (savedServices) setServices(JSON.parse(savedServices));
+      if (savedSettings) setSettings(JSON.parse(savedSettings));
+    };
+
     initData();
   }, []);
 
-  // 2. Persist to Cloud and Local whenever state changes
+  // 2. Local Backup Persistence
   useEffect(() => {
     localStorage.setItem('gab_brands', JSON.stringify(brands));
-    if (supabase && isAdmin) {
-      // Logic to upsert brands to cloud
-      // In a real production app, we would use more surgical updates
-      // but for this retail app, we sync the full state on admin change
-    }
-  }, [brands, isAdmin]);
+  }, [brands]);
 
   useEffect(() => {
     localStorage.setItem('gab_services', JSON.stringify(services));
@@ -80,21 +106,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [settings]);
 
   const syncToCloud = async () => {
-    if (!supabase) return;
+    if (!supabase) {
+      alert("Cloud database not connected. Check Vercel environment variables.");
+      return;
+    }
+
     try {
-      // Clear and re-insert to ensure global sync
-      await supabase.from('brands').delete().neq('id', '0');
-      await supabase.from('brands').insert(brands);
+      console.log("Starting Global Sync...");
       
-      await supabase.from('services').delete().neq('id', '0');
-      await supabase.from('services').insert(services);
+      // 1. Sync Brands
+      const { error: bDelErr } = await supabase.from('brands').delete().neq('id', '0');
+      if (bDelErr) throw new Error("Brands Delete Failed: " + bDelErr.message);
+      const { error: bInsErr } = await supabase.from('brands').insert(brands);
+      if (bInsErr) throw new Error("Brands Insert Failed: " + bInsErr.message);
+
+      // 2. Sync Services
+      const { error: sDelErr } = await supabase.from('services').delete().neq('id', '0');
+      if (sDelErr) throw new Error("Services Delete Failed: " + sDelErr.message);
+      const { error: sInsErr } = await supabase.from('services').insert(services);
+      if (sInsErr) throw new Error("Services Insert Failed: " + sInsErr.message);
+
+      // 3. Sync Settings
+      const { error: setErr } = await supabase.from('settings').upsert({ id: 1, ...settings });
+      if (setErr) throw new Error("Settings Sync Failed: " + setErr.message);
       
-      await supabase.from('settings').upsert({ id: 1, ...settings });
-      
-      alert("Global Cloud Sync Successful! Your changes are now live worldwide.");
-    } catch (e) {
-      console.error("Cloud Sync Failed:", e);
-      alert("Cloud Sync Failed. Check your database connection.");
+      alert("GLOBAL UPDATE LIVE! Every device worldwide now sees your latest changes.");
+    } catch (e: any) {
+      console.error("Sync Error:", e);
+      alert("Update Failed: " + e.message + "\n\nMake sure you disabled RLS in Supabase SQL Editor.");
     }
   };
 
