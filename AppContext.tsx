@@ -62,7 +62,7 @@ const toCamel = (input: any): any => {
   const out: Record<string, any> = {};
   for (const key of Object.keys(input)) {
     const val = (input as any)[key];
-    const newKey = toCamelKey(key);
+    const newKey = toCamel(key);
     if (Array.isArray(val)) {
       out[newKey] = val.map((v) => (isPlainObject(v) || Array.isArray(v) ? toCamel(v) : v));
     } else if (isPlainObject(val)) {
