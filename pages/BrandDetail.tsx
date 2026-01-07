@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../AppContext';
@@ -28,7 +27,10 @@ const BrandDetail: React.FC = () => {
     );
   }
 
-  const selectedSizeFinance = selectedSize ? brand.sizeData[selectedSize] : null;
+  // Defensive accessors: ensure arrays/objects exist to avoid runtime errors
+  const availableSizes: string[] = Array.isArray(brand.availableSizes) ? brand.availableSizes : [];
+  const sizeData: Record<string, any> = brand.sizeData && typeof brand.sizeData === 'object' ? brand.sizeData : {};
+  const selectedSizeFinance = selectedSize ? sizeData[selectedSize] : null;
 
   const handleWhatsAppOrder = () => {
     if (!selectedSize) {
@@ -36,7 +38,9 @@ const BrandDetail: React.FC = () => {
       return;
     }
 
-    const priceText = selectedSizeFinance ? `\nPrice: Rs. ${selectedSizeFinance.salePrice}` : '';
+    const priceText = selectedSizeFinance && selectedSizeFinance.salePrice !== undefined
+      ? `\nPrice: Rs. ${selectedSizeFinance.salePrice}`
+      : '';
     const message = encodeURIComponent(
       `Hello ${settings.businessName}, I am interested in purchasing ${brand.name} tyres. \nSize: ${selectedSize}${priceText} \nPlease let me know the current availability.`
     );
@@ -92,7 +96,7 @@ const BrandDetail: React.FC = () => {
                 onChange={(e) => setSelectedSize(e.target.value)}
               >
                 <option value="">Choose a size...</option>
-                {brand.availableSizes.map(size => (
+                {availableSizes.map(size => (
                   <option key={size} value={size}>{size}</option>
                 ))}
               </select>
