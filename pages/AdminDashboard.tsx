@@ -2,8 +2,8 @@
 import React from 'react';
 import { useApp } from '../AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Tag, Wrench, Settings, LogOut, ChevronRight, Package, Calculator, TrendingUp, AlertTriangle, Cloud, CloudOff, RefreshCw } from 'lucide-react';
-import { supabase } from '../supabaseClient';
+import { LayoutDashboard, Tag, Wrench, Settings, LogOut, ChevronRight, Package, Calculator, TrendingUp, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { db } from '../firebaseConfig';
 
 const AdminDashboard: React.FC = () => {
   const { isAdmin, logout, brands, services, syncToCloud } = useApp();
@@ -26,37 +26,28 @@ const AdminDashboard: React.FC = () => {
   });
 
   const netPotentialMargin = totalPotentialRevenue - totalPurchaseCost - totalOtherExpenses;
-  const averageMarginPerUnit = totalActiveSizes > 0 ? netPotentialMargin / totalActiveSizes : 0;
-
-  const menuItems = [
-    { name: 'Manage Brands', icon: <Tag />, path: '/admin/brands', desc: 'Add, edit or delete tyre brands', color: 'bg-blue-500' },
-    { name: 'Manage Services', icon: <Wrench />, path: '/admin/services', desc: 'Update service prices and details', color: 'bg-emerald-500' },
-    { name: 'System Settings', icon: <Settings />, path: '/admin/settings', desc: 'Themes, credentials and business info', color: 'bg-purple-500' },
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4">
         <div>
           <h1 className="text-4xl font-black text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500 font-medium">Control center for GAB Tyres worldwide business</p>
+          <p className="text-gray-500 font-medium">Firebase Real-time Control Center</p>
         </div>
         
         <div className="flex items-center space-x-3">
-          <div className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold ${supabase ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
-            {supabase ? <Cloud size={14} /> : <CloudOff size={14} />}
-            <span>{supabase ? 'Cloud Synchronized' : 'Offline Mode (Local Only)'}</span>
+          <div className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold ${db ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
+            {db ? <Cloud size={14} /> : <CloudOff size={14} />}
+            <span>{db ? 'Firebase Connected' : 'Local Mode'}</span>
           </div>
           
-          {supabase && (
-            <button 
-              onClick={syncToCloud}
-              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-            >
-              <RefreshCw size={20} />
-              <span>Push Global Update</span>
-            </button>
-          )}
+          <button 
+            onClick={syncToCloud}
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+          >
+            <RefreshCw size={20} />
+            <span>Push Global Update</span>
+          </button>
 
           <button 
             onClick={() => { logout(); navigate('/'); }}
@@ -75,7 +66,6 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-blue-100 p-3 rounded-xl text-blue-600">
               <Package size={24} />
             </div>
-            <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">Active</span>
           </div>
           <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Total Brands</p>
           <h3 className="text-3xl font-black text-gray-900">{brands.length}</h3>
@@ -85,7 +75,6 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-emerald-100 p-3 rounded-xl text-emerald-600">
               <Wrench size={24} />
             </div>
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-lg">Steady</span>
           </div>
           <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Services</p>
           <h3 className="text-3xl font-black text-gray-900">{services.length}</h3>
@@ -95,7 +84,6 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-purple-100 p-3 rounded-xl text-purple-600">
               <Calculator size={24} />
             </div>
-            <span className="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-lg">Managed</span>
           </div>
           <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Stocked Sizes</p>
           <h3 className="text-3xl font-black text-gray-900">{totalActiveSizes}</h3>
@@ -105,7 +93,6 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-orange-100 p-3 rounded-xl text-orange-600">
               <TrendingUp size={24} />
             </div>
-            <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">Potential</span>
           </div>
           <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Est. Net Margin</p>
           <h3 className="text-3xl font-black text-gray-900">Rs. {netPotentialMargin.toLocaleString()}</h3>
@@ -114,7 +101,11 @@ const AdminDashboard: React.FC = () => {
 
       <h2 className="text-2xl font-black text-gray-900 mb-8">Management Areas</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {menuItems.map((item) => (
+        {[
+          { name: 'Manage Brands', icon: <Tag />, path: '/admin/brands', desc: 'Add, edit or delete tyre brands', color: 'bg-blue-500' },
+          { name: 'Manage Services', icon: <Wrench />, path: '/admin/services', desc: 'Update service prices and details', color: 'bg-emerald-500' },
+          { name: 'System Settings', icon: <Settings />, path: '/admin/settings', desc: 'Themes, credentials and business info', color: 'bg-purple-500' },
+        ].map((item) => (
           <div 
             key={item.name}
             onClick={() => navigate(item.path)}
