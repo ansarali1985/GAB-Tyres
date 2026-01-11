@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useApp } from '../AppContext';
 import { THEMES } from '../constants';
@@ -9,6 +8,11 @@ const Home: React.FC = () => {
   const { brands, services, settings } = useApp();
   const themeStyles = THEMES[settings.theme];
   const navigate = useNavigate();
+
+  const handleServiceBooking = (serviceName: string) => {
+    const message = encodeURIComponent(`Hello ${settings.businessName}, I would like to book a ${serviceName} service for my vehicle. Please let me know the current available slots and pricing.`);
+    window.open(`https://wa.me/${settings.whatsappNumber}?text=${message}`, '_blank');
+  };
 
   return (
     <div className="min-h-screen pb-20 bg-slate-50/50">
@@ -117,7 +121,8 @@ const Home: React.FC = () => {
             {services.map((service) => (
               <div 
                 key={service.id} 
-                className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-blue-200 transition-all duration-300 group overflow-hidden"
+                onClick={() => handleServiceBooking(service.name)}
+                className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl hover:shadow-2xl hover:border-blue-200 transition-all duration-300 group overflow-hidden cursor-pointer"
               >
                 <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-5xl mb-8 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 overflow-hidden">
                   {service.image ? (
