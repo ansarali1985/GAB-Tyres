@@ -1,4 +1,3 @@
-
 export enum ThemeType {
   DEFAULT = 'DEFAULT',
   DARK = 'DARK',
@@ -37,6 +36,7 @@ export interface TyreBrand {
   image: string;
   description: string;
   availableSizes: string[];
+  patterns: string[]; // New field for tyre patterns (e.g., PS4, Primacy, etc.)
   sizeData: Record<string, SizeFinance>;
 }
 
