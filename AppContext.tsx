@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { TyreBrand, ServiceItem, AppSettings } from './types';
+import { TyreBrand, ServiceItem, AppSettings, TyrePattern } from './types';
 import { INITIAL_BRANDS, INITIAL_SERVICES, DEFAULT_SETTINGS } from './constants';
 import { db } from './firebaseConfig';
 import { ref, set, onValue } from "firebase/database";
@@ -57,9 +57,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (data.brands && Array.isArray(data.brands)) {
           const decodedBrands = data.brands.map((b: any) => ({
             ...b,
-            availableSizes: Array.isArray(b.availableSizes) ? b.availableSizes : [],
-            patterns: Array.isArray(b.patterns) ? b.patterns : [],
-            sizeData: decodeSizeData(b.sizeData || {})
+            patterns: Array.isArray(b.patterns) ? b.patterns.map((p: any) => ({
+              ...p,
+              availableSizes: Array.isArray(p.availableSizes) ? p.availableSizes : [],
+              sizeData: decodeSizeData(p.sizeData || {})
+            })) : []
           }));
           _setBrands(decodedBrands);
         }
@@ -79,10 +81,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const sourceBrands = rawData?.brands || brands;
       const sourceServices = rawData?.services || services;
       const sourceSettings = rawData?.settings || settings;
+      
       const sanitizedBrands = sourceBrands.map((b: TyreBrand) => ({
         ...b,
-        sizeData: encodeSizeData(b.sizeData || {})
+        patterns: (b.patterns || []).map(p => ({
+          ...p,
+          sizeData: encodeSizeData(p.sizeData || {})
+        }))
       }));
+
       await set(ref(db, 'businessData'), {
         brands: sanitizedBrands,
         services: sourceServices,
