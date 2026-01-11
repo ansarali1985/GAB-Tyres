@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useApp } from '../AppContext';
 import { useNavigate, Navigate } from 'react-router-dom';
@@ -42,7 +41,7 @@ const AdminDashboard: React.FC = () => {
           </div>
           
           <button 
-            onClick={syncToCloud}
+            onClick={() => syncToCloud()}
             className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
           >
             <RefreshCw size={20} />
