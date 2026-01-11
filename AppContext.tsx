@@ -1,9 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TyreBrand, ServiceItem, AppSettings } from './types';
 import { INITIAL_BRANDS, INITIAL_SERVICES, DEFAULT_SETTINGS } from './constants';
 import { db } from './firebaseConfig';
-import { ref, set, get, onValue } from "firebase/database";
+import { ref, set, onValue } from "firebase/database";
 
 interface AppContextType {
   brands: TyreBrand[];
@@ -11,24 +10,24 @@ interface AppContextType {
   settings: AppSettings;
   isAdmin: boolean;
   isLoading: boolean;
-  setBrands: React.Dispatch<React.SetStateAction<TyreBrand[]>>;
-  setServices: React.Dispatch<React.SetStateAction<ServiceItem[]>>;
-  setSettings: React.Dispatch<React.SetStateAction<AppSettings>>;
+  setBrands: (b: TyreBrand[]) => void;
+  setServices: (s: ServiceItem[]) => void;
+  setSettings: (st: AppSettings) => void;
   login: (u: string, p: string) => boolean;
   logout: () => void;
-  syncToCloud: () => Promise<void>;
+  syncToCloud: (customData?: any) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [brands, setBrands] = useState<TyreBrand[]>(INITIAL_BRANDS);
-  const [services, setServices] = useState<ServiceItem[]>(INITIAL_SERVICES);
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [brands, _setBrands] = useState<TyreBrand[]>(INITIAL_BRANDS);
+  const [services, _setServices] = useState<ServiceItem[]>(INITIAL_SERVICES);
+  const [settings, _setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [isAdmin, setIsAdmin] = useState<boolean>(() => sessionStorage.getItem('gab_isAdmin') === 'true');
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Load Data from Firebase
+  // 1. Load Data from Firebase (One-way: Cloud -> Local)
   useEffect(() => {
     if (!db) {
       console.warn("Firebase not configured yet.");
@@ -38,14 +37,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const dataRef = ref(db, 'businessData');
     
-    // This creates a "Live" connection. If you change data in Firebase, 
-    // it updates on every user's screen instantly.
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        if (data.brands) setBrands(data.brands);
-        if (data.services) setServices(data.services);
-        if (data.settings) setSettings(data.settings);
+        if (data.brands) _setBrands(data.brands);
+        if (data.services) _setServices(data.services);
+        if (data.settings) _setSettings(data.settings);
         console.log("Worldwide Data Synced via Firebase.");
       }
       setIsLoading(false);
@@ -57,33 +54,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return () => unsubscribe();
   }, []);
 
-  // 2. Local Backup (just in case)
-  useEffect(() => {
-    localStorage.setItem('gab_brands', JSON.stringify(brands));
-    localStorage.setItem('gab_services', JSON.stringify(services));
-    localStorage.setItem('gab_settings', JSON.stringify(settings));
-  }, [brands, services, settings]);
-
-  const syncToCloud = async () => {
-    if (!db) {
-      alert("Firebase not connected. Please add your VITE_FIREBASE keys to Vercel.");
-      return;
-    }
+  // Sync to Cloud Function
+  const syncToCloud = async (customData?: any) => {
+    if (!db) return;
 
     try {
-      // With Firebase, we just push the whole object. No tables needed!
-      await set(ref(db, 'businessData'), {
+      const dataToPush = customData || {
         brands,
         services,
         settings,
         lastUpdated: new Date().toISOString()
-      });
-      
-      alert("GLOBAL UPDATE SUCCESSFUL! Your new prices and brands are now live on every device in the world.");
+      };
+
+      await set(ref(db, 'businessData'), dataToPush);
+      console.log("Cloud Push Successful");
     } catch (e: any) {
       console.error("Firebase Sync Error:", e);
-      alert("Sync Failed: " + e.message + "\nCheck if your Firebase Rules are set to public.");
     }
+  };
+
+  // Wrapper functions to ensure admin changes sync immediately
+  const setBrands = (newBrands: TyreBrand[]) => {
+    _setBrands(newBrands);
+    if (isAdmin) syncToCloud({ brands: newBrands, services, settings, lastUpdated: new Date().toISOString() });
+  };
+
+  const setServices = (newServices: ServiceItem[]) => {
+    _setServices(newServices);
+    if (isAdmin) syncToCloud({ brands, services: newServices, settings, lastUpdated: new Date().toISOString() });
+  };
+
+  const setSettings = (newSettings: AppSettings) => {
+    _setSettings(newSettings);
+    if (isAdmin) syncToCloud({ brands, services, settings: newSettings, lastUpdated: new Date().toISOString() });
   };
 
   const login = (u: string, p: string): boolean => {
