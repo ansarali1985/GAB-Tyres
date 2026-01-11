@@ -36,7 +36,7 @@ export interface TyreBrand {
   image: string;
   description: string;
   availableSizes: string[];
-  patterns: string[]; // New field for tyre patterns (e.g., PS4, Primacy, etc.)
+  patterns: string[]; // New field for patterns (models)
   sizeData: Record<string, SizeFinance>;
 }
 
@@ -46,7 +46,7 @@ export interface ServiceItem {
   description: string;
   price: number;
   icon: string;
-  image?: string; // Optional image to replace emoji
+  image?: string;
 }
 
 export interface AppSettings {
@@ -58,19 +58,16 @@ export interface AppSettings {
   adminPassword: string;
   businessName: string;
   businessAddress: string;
-  // Dashboard Editable Content
   homeHeroImage: string;
   homeHeroTitle: string;
   homeHeroSubtitle: string;
   homeBrandsTitle: string;
   homeServicesTitle: string;
   homeServicesSubtitle: string;
-  // Layout Management
   showHero: boolean;
   showBrands: boolean;
   showServices: boolean;
   showTrust: boolean;
-  // Footer
   footerDescription: string;
   footerQuickLinks: FooterLink[];
   footerBusinessHours: BusinessHour[];
