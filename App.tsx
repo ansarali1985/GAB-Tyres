@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './AppContext';
 import Navbar from './components/Navbar';
-import AdminNavbar from './components/AdminNavbar';
+import AdminNavbar from './components/AdminNavbar.tsx';
 import Home from './pages/Home';
 import Brands from './pages/Brands';
 import BrandDetail from './pages/BrandDetail';
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
   
   return (
     <footer className="bg-gray-900 text-gray-400 py-16 px-4">
-      <div className="max-w-7xl auto grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center space-x-2 mb-6">
             <div className="bg-blue-600 text-white p-1 rounded font-bold text-xl">GAB</div>
