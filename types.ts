@@ -30,14 +30,19 @@ export interface SizeFinance {
   otherExpenses: number;
 }
 
+export interface TyrePattern {
+  id: string;
+  name: string;
+  availableSizes: string[];
+  sizeData: Record<string, SizeFinance>;
+}
+
 export interface TyreBrand {
   id: string;
   name: string;
   image: string;
   description: string;
-  availableSizes: string[];
-  patterns: string[]; // New field for patterns (models)
-  sizeData: Record<string, SizeFinance>;
+  patterns: TyrePattern[];
 }
 
 export interface ServiceItem {
