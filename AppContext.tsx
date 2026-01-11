@@ -63,10 +63,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (data) {
         if (data.brands && Array.isArray(data.brands)) {
           // Decode brands sizeData keys when loading from cloud
-          // IMPORTANT: Ensure availableSizes and sizeData always exist as empty array/object if missing
+          // IMPORTANT: Ensure availableSizes, patterns and sizeData always exist as empty if missing
           const decodedBrands = data.brands.map((b: any) => ({
             ...b,
             availableSizes: Array.isArray(b.availableSizes) ? b.availableSizes : [],
+            patterns: Array.isArray(b.patterns) ? b.patterns : [],
             sizeData: decodeSizeData(b.sizeData || {})
           }));
           _setBrands(decodedBrands);
