@@ -16,7 +16,7 @@ const AdminNavbar: React.FC = () => {
   ];
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+    <div className="bg-white border-b border-gray-200 sticky top-16 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 overflow-x-auto hide-scrollbar">
           <div className="flex space-x-1 md:space-x-4 min-w-max">
