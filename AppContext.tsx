@@ -59,7 +59,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!db) return;
 
     try {
-      const dataToPush = customData || {
+      // Safety: Ignore arguments that are React/Browser Events
+      const isEvent = customData && (customData.nativeEvent || customData.target);
+      const cleanData = isEvent ? null : customData;
+
+      const dataToPush = cleanData || {
         brands,
         services,
         settings,
