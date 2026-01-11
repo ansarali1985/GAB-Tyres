@@ -13,6 +13,8 @@ import AdminBrands from './pages/AdminBrands';
 import AdminServices from './pages/AdminServices';
 import AdminSettings from './pages/AdminSettings';
 import { RefreshCw } from 'lucide-react';
+import { THEMES } from './constants';
+import { ThemeType } from './types';
 
 const LoadingScreen: React.FC = () => (
   <div className="fixed inset-0 bg-white z-[999] flex flex-col items-center justify-center">
@@ -28,12 +30,28 @@ const LoadingScreen: React.FC = () => (
 
 const Footer: React.FC = () => {
   const { settings } = useApp();
+  const themeStyles = THEMES[settings.theme];
+  
+  // Helper to determine the specific logo box color based on the current theme
+  const getLogoBg = () => {
+    switch (settings.theme) {
+      case ThemeType.LUXURY: return 'bg-amber-700';
+      case ThemeType.VIBRANT: return 'bg-red-600';
+      case ThemeType.NATURE: return 'bg-emerald-700';
+      case ThemeType.DARK: return 'bg-zinc-700';
+      default: return 'bg-blue-600';
+    }
+  };
+
+  // Extract hover color from the theme's accent property
+  const hoverClass = themeStyles.accent.replace('text-', 'hover:text-');
+
   return (
     <footer className="bg-gray-900 text-gray-400 py-16 px-4">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center space-x-2 mb-6">
-            <div className="bg-blue-600 text-white p-1 rounded font-bold text-xl">GAB</div>
+            <div className={`${getLogoBg()} text-white p-1 rounded font-bold text-xl transition-colors duration-500`}>GAB</div>
             <span className="text-white text-xl font-black">{settings.businessName.split(' ')[1] || 'Tyres'}</span>
           </div>
           <p className="max-w-sm mb-8 leading-relaxed">{settings.footerDescription}</p>
@@ -42,7 +60,14 @@ const Footer: React.FC = () => {
           <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Quick Links</h4>
           <ul className="space-y-4">
             {settings.footerQuickLinks.map(link => (
-              <li key={link.id}><a href={link.url} className="hover:text-blue-500 transition-colors">{link.label}</a></li>
+              <li key={link.id}>
+                <a 
+                  href={link.url} 
+                  className={`${hoverClass} transition-colors duration-300`}
+                >
+                  {link.label}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
