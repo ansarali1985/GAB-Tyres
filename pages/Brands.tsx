@@ -52,7 +52,8 @@ const Brands: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{brand.name}</h3>
                 <p className="text-gray-500 text-sm mb-4 line-clamp-2">{brand.description}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{brand.availableSizes.length} Sizes Available</span>
+                  {/* Calculate total sizes from all patterns of the brand as TyreBrand does not have availableSizes directly */}
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{brand.patterns.reduce((sum, p) => sum + (p.availableSizes?.length || 0), 0)} Sizes Available</span>
                   <div className={`p-2 rounded-xl ${themeStyles.secondary} ${themeStyles.text} group-hover:bg-blue-600 group-hover:text-white transition-colors`}>
                     <ChevronRight size={18} />
                   </div>
