@@ -14,15 +14,27 @@ export const INITIAL_BRANDS: TyreBrand[] = [
     name: 'Michelin', 
     image: 'https://images.unsplash.com/photo-1578844541663-4711efaf3f1f?auto=format&fit=crop&q=80&w=400', 
     description: 'World-renowned for durability and high-end performance.', 
-    availableSizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[6]],
-    patterns: ['Pilot Sport 4', 'Primacy 4 ST', 'Energy XM2+'],
-    sizeData: {
-      [ALL_TYRE_SIZES[0]]: { salePrice: 12000, purchasePrice: 9500, otherExpenses: 500 },
-      [ALL_TYRE_SIZES[6]]: { salePrice: 18500, purchasePrice: 15000, otherExpenses: 700 },
-    }
+    patterns: [
+      {
+        id: 'p1',
+        name: 'Pilot Sport 4',
+        availableSizes: [ALL_TYRE_SIZES[6]],
+        sizeData: {
+          [ALL_TYRE_SIZES[6]]: { salePrice: 18500, purchasePrice: 15000, otherExpenses: 700 }
+        }
+      },
+      {
+        id: 'p2',
+        name: 'Energy XM2+',
+        availableSizes: [ALL_TYRE_SIZES[0]],
+        sizeData: {
+          [ALL_TYRE_SIZES[0]]: { salePrice: 12000, purchasePrice: 9500, otherExpenses: 500 }
+        }
+      }
+    ]
   },
-  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availableSizes: [ALL_TYRE_SIZES[1]], patterns: ['Advan Fleva', 'BlueEarth'], sizeData: {} },
-  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availableSizes: [ALL_TYRE_SIZES[2]], patterns: ['Eagle F1', 'Assurance ComfortTred'], sizeData: {} },
+  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', patterns: [] },
+  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', patterns: [] },
 ];
 
 export const INITIAL_SERVICES: ServiceItem[] = [
