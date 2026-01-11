@@ -61,11 +61,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        if (data.brands) {
+        if (data.brands && Array.isArray(data.brands)) {
           // Decode brands sizeData keys when loading from cloud
+          // IMPORTANT: Ensure availableSizes and sizeData always exist as empty array/object if missing
           const decodedBrands = data.brands.map((b: any) => ({
             ...b,
-            sizeData: decodeSizeData(b.sizeData)
+            availableSizes: Array.isArray(b.availableSizes) ? b.availableSizes : [],
+            sizeData: decodeSizeData(b.sizeData || {})
           }));
           _setBrands(decodedBrands);
         }
@@ -99,7 +101,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Sanitize brands: Encode sizeData keys for Firebase
       const sanitizedBrands = sourceBrands.map((b: TyreBrand) => ({
         ...b,
-        sizeData: encodeSizeData(b.sizeData)
+        sizeData: encodeSizeData(b.sizeData || {})
       }));
 
       const dataToPush = {
