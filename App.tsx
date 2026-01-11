@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './AppContext';
 import Navbar from './components/Navbar';
-import AdminNavbar from './components/AdminNavbar.tsx';
+import AdminNavbar from './components/AdminNavbar';
 import Home from './pages/Home';
 import Brands from './pages/Brands';
 import BrandDetail from './pages/BrandDetail';
