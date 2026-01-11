@@ -1,4 +1,4 @@
-import { ThemeType, TyreBrand, ServiceItem, AppSettings, SizeFinance } from './types';
+import { ThemeType, TyreBrand, ServiceItem, AppSettings } from './types';
 
 export const ALL_TYRE_SIZES = [
   "175/65 R14", "185/60 R15", "185/65 R15", "195/55 R15", "195/60 R15",
@@ -15,18 +15,14 @@ export const INITIAL_BRANDS: TyreBrand[] = [
     image: 'https://images.unsplash.com/photo-1578844541663-4711efaf3f1f?auto=format&fit=crop&q=80&w=400', 
     description: 'World-renowned for durability and high-end performance.', 
     availableSizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[6]],
-    patterns: ['Pilot Sport 4', 'Primacy 4+', 'Energy XM2+'],
+    patterns: ['Pilot Sport 4', 'Primacy 4 ST', 'Energy XM2+'],
     sizeData: {
       [ALL_TYRE_SIZES[0]]: { salePrice: 12000, purchasePrice: 9500, otherExpenses: 500 },
       [ALL_TYRE_SIZES[6]]: { salePrice: 18500, purchasePrice: 15000, otherExpenses: 700 },
     }
   },
-  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availableSizes: [ALL_TYRE_SIZES[1], ALL_TYRE_SIZES[7]], patterns: ['Advan Fleva', 'BlueEarth'], sizeData: {} },
-  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availableSizes: [ALL_TYRE_SIZES[2], ALL_TYRE_SIZES[8]], patterns: ['Eagle F1', 'Assurance ComfortTred'], sizeData: {} },
-  { id: '4', name: 'BF Goodrich', image: 'https://images.unsplash.com/photo-1551522435-a13afa10f103?auto=format&fit=crop&q=80&w=400', description: 'Tough, dependable tyres for the most demanding off-road trails.', availableSizes: [ALL_TYRE_SIZES[3], ALL_TYRE_SIZES[9]], patterns: ['All-Terrain T/A KO2'], sizeData: {} },
-  { id: '5', name: 'TrackMax', image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=400', description: 'Uncompromising performance for the serious track enthusiast.', availableSizes: [ALL_TYRE_SIZES[4], ALL_TYRE_SIZES[10]], patterns: ['X-Privilo TX3'], sizeData: {} },
-  { id: '6', name: 'Nankang', image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&q=80&w=400', description: 'Quality engineering meets exceptional value for daily driving.', availableSizes: [ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[11]], patterns: ['Noble Sport NS-20'], sizeData: {} },
-  { id: '7', name: 'GT Radial', image: 'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?auto=format&fit=crop&q=80&w=400', description: 'Exceptional control, comfort, and stability for any passenger car.', availableSizes: [ALL_TYRE_SIZES[0], ALL_TYRE_SIZES[5], ALL_TYRE_SIZES[10]], patterns: ['Champiro SX2', 'Champiro HPY'], sizeData: {} },
+  { id: '2', name: 'Yokohama', image: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=400', description: 'Japanese precision engineered for maximum grip.', availableSizes: [ALL_TYRE_SIZES[1]], patterns: ['Advan Fleva', 'BlueEarth'], sizeData: {} },
+  { id: '3', name: 'Goodyear', image: 'https://images.unsplash.com/photo-1594731114940-0255a62f8373?auto=format&fit=crop&q=80&w=400', description: 'Innovative American designs for all-season confidence.', availableSizes: [ALL_TYRE_SIZES[2]], patterns: ['Eagle F1', 'Assurance ComfortTred'], sizeData: {} },
 ];
 
 export const INITIAL_SERVICES: ServiceItem[] = [
@@ -45,7 +41,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   adminPassword: 'Anudada@007',
   businessName: 'GAB Tyres',
   businessAddress: 'Plot 42, Main Commercial Area, Phase 2, Industrial Estate',
-  // Dashboard Defaults
   homeHeroImage: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=800',
   homeHeroTitle: 'Performance Starts From The Ground Up.',
   homeHeroSubtitle: 'The most trusted tyre specialists in the region. Explore high-performance brands and precision services.',
@@ -56,23 +51,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showBrands: true,
   showServices: true,
   showTrust: true,
-  // Footer
-  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010. Your safety is our number one priority.',
-  footerQuickLinks: [
-    { id: '1', label: 'About Us', url: '#' },
-    { id: '2', label: 'Tyre Care Tips', url: '#' },
-    { id: '3', label: 'Warranty Info', url: '#' },
-    { id: '4', label: 'Privacy Policy', url: '#' },
-  ],
-  footerBusinessHours: [
-    { id: '1', day: 'Mon - Fri', hours: '9:00 - 20:00' },
-    { id: '2', day: 'Saturday', hours: '10:00 - 18:00' },
-    { id: '3', day: 'Sunday', hours: 'Closed' },
-  ],
-  footerSocials: [
-    { id: '1', platform: 'FB', url: 'https://facebook.com' },
-    { id: '2', platform: 'IG', url: 'https://instagram.com' },
-  ]
+  footerDescription: 'Premium tyre retailer providing the best brands and professional wheel services since 2010.',
+  footerQuickLinks: [{ id: '1', label: 'About Us', url: '#' }],
+  footerBusinessHours: [{ id: '1', day: 'Mon - Sat', hours: '9:00 - 20:00' }],
+  footerSocials: [{ id: '1', platform: 'FB', url: '#' }]
 };
 
 export const THEMES = {
