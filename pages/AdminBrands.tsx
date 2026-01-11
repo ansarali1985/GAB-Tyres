@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useApp } from '../AppContext';
 import { ALL_TYRE_SIZES } from '../constants';
@@ -313,9 +312,9 @@ const AdminBrands: React.FC = () => {
                 <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Inventory Health</p>
                 <div className="flex items-center space-x-3 text-sm">
                    <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full" style={{ width: `${Math.min(100, (brand.availableSizes.length / ALL_TYRE_SIZES.length) * 100)}%` }}></div>
+                      <div className="bg-blue-500 h-full" style={{ width: `${Math.min(100, ((brand.availableSizes || []).length / ALL_TYRE_SIZES.length) * 100)}%` }}></div>
                    </div>
-                   <span className="font-bold text-gray-900">{brand.availableSizes.length} Sizes</span>
+                   <span className="font-bold text-gray-900">{(brand.availableSizes || []).length} Sizes</span>
                 </div>
               </div>
             </div>
