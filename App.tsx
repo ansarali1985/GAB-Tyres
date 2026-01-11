@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './AppContext';
 import Navbar from './components/Navbar';
-import AdminNavbar from './components/AdminNavbar.tsx';
+import AdminNavbar from './components/AdminNavbar';
 import Home from './pages/Home';
 import Brands from './pages/Brands';
 import BrandDetail from './pages/BrandDetail';
@@ -28,7 +28,6 @@ const LoadingScreen: React.FC = () => (
 
 const Footer: React.FC = () => {
   const { settings } = useApp();
-  
   return (
     <footer className="bg-gray-900 text-gray-400 py-16 px-4">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -37,49 +36,16 @@ const Footer: React.FC = () => {
             <div className="bg-blue-600 text-white p-1 rounded font-bold text-xl">GAB</div>
             <span className="text-white text-xl font-black">{settings.businessName.split(' ')[1] || 'Tyres'}</span>
           </div>
-          <p className="max-w-sm mb-8 leading-relaxed">
-            {settings.footerDescription}
-          </p>
-          <div className="flex space-x-4">
-            {settings.footerSocials.map(s => (
-              <a 
-                key={s.id} 
-                href={s.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
-              >
-                {s.platform}
-              </a>
-            ))}
-          </div>
+          <p className="max-w-sm mb-8 leading-relaxed">{settings.footerDescription}</p>
         </div>
         <div>
           <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Quick Links</h4>
           <ul className="space-y-4">
             {settings.footerQuickLinks.map(link => (
-              <li key={link.id}>
-                <a href={link.url} className="hover:text-blue-500 transition-colors">{link.label}</a>
-              </li>
+              <li key={link.id}><a href={link.url} className="hover:text-blue-500 transition-colors">{link.label}</a></li>
             ))}
           </ul>
         </div>
-        <div>
-          <h4 className="text-white font-bold uppercase tracking-widest text-sm mb-6">Business Hours</h4>
-          <ul className="space-y-4 text-sm">
-            {settings.footerBusinessHours.map(hour => (
-              <li key={hour.id} className="flex justify-between">
-                <span>{hour.day}</span> 
-                <span className={hour.hours.toLowerCase().includes('closed') ? 'text-red-400' : 'text-white'}>
-                  {hour.hours}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-gray-800 text-center text-xs opacity-50">
-        &copy; {new Date().getFullYear()} {settings.businessName}. All rights reserved. Professional Grade Tyre Retail.
       </div>
     </footer>
   );
@@ -88,7 +54,6 @@ const Footer: React.FC = () => {
 const AdminLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin') && location.pathname !== '/admin/login';
-  
   return (
     <>
       {isAdminPath && <AdminNavbar />}
@@ -99,9 +64,7 @@ const AdminLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
 
 const AppContent: React.FC = () => {
   const { isLoading } = useApp();
-  
   if (isLoading) return <LoadingScreen />;
-
   return (
     <Router>
       <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-blue-200 selection:text-blue-900">
