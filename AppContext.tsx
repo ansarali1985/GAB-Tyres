@@ -4,6 +4,27 @@ import { INITIAL_BRANDS, INITIAL_SERVICES, DEFAULT_SETTINGS } from './constants'
 import { db } from './firebaseConfig';
 import { ref, set, onValue } from "firebase/database";
 
+// Helper functions to handle Firebase key restrictions (no / . # $ [ ])
+const encodeSizeData = (data: Record<string, any>) => {
+  const encoded: Record<string, any> = {};
+  Object.entries(data || {}).forEach(([key, val]) => {
+    // Replace slash with a safe sequence
+    const safeKey = key.replace(/\//g, '_SL_').replace(/\./g, '_DT_');
+    encoded[safeKey] = val;
+  });
+  return encoded;
+};
+
+const decodeSizeData = (data: Record<string, any>) => {
+  const decoded: Record<string, any> = {};
+  Object.entries(data || {}).forEach(([key, val]) => {
+    // Restore the slash for UI usage
+    const originalKey = key.replace(/_SL_/g, '/').replace(/_DT_/g, '.');
+    decoded[originalKey] = val;
+  });
+  return decoded;
+};
+
 interface AppContextType {
   brands: TyreBrand[];
   services: ServiceItem[];
@@ -40,7 +61,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        if (data.brands) _setBrands(data.brands);
+        if (data.brands) {
+          // Decode brands sizeData keys when loading from cloud
+          const decodedBrands = data.brands.map((b: any) => ({
+            ...b,
+            sizeData: decodeSizeData(b.sizeData)
+          }));
+          _setBrands(decodedBrands);
+        }
         if (data.services) _setServices(data.services);
         if (data.settings) _setSettings(data.settings);
         console.log("Worldwide Data Synced via Firebase.");
@@ -61,17 +89,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       // Safety: Ignore arguments that are React/Browser Events
       const isEvent = customData && (customData.nativeEvent || customData.target);
-      const cleanData = isEvent ? null : customData;
+      const rawData = isEvent ? null : customData;
 
-      const dataToPush = cleanData || {
-        brands,
-        services,
-        settings,
+      // Use either the customData provided or the current state
+      const sourceBrands = rawData?.brands || brands;
+      const sourceServices = rawData?.services || services;
+      const sourceSettings = rawData?.settings || settings;
+
+      // Sanitize brands: Encode sizeData keys for Firebase
+      const sanitizedBrands = sourceBrands.map((b: TyreBrand) => ({
+        ...b,
+        sizeData: encodeSizeData(b.sizeData)
+      }));
+
+      const dataToPush = {
+        brands: sanitizedBrands,
+        services: sourceServices,
+        settings: sourceSettings,
         lastUpdated: new Date().toISOString()
       };
 
       await set(ref(db, 'businessData'), dataToPush);
-      console.log("Cloud Push Successful");
+      console.log("Cloud Push Successful (Sanitized)");
     } catch (e: any) {
       console.error("Firebase Sync Error:", e);
     }
@@ -80,17 +119,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Wrapper functions to ensure admin changes sync immediately
   const setBrands = (newBrands: TyreBrand[]) => {
     _setBrands(newBrands);
-    if (isAdmin) syncToCloud({ brands: newBrands, services, settings, lastUpdated: new Date().toISOString() });
+    if (isAdmin) syncToCloud({ brands: newBrands, services, settings });
   };
 
   const setServices = (newServices: ServiceItem[]) => {
     _setServices(newServices);
-    if (isAdmin) syncToCloud({ brands, services: newServices, settings, lastUpdated: new Date().toISOString() });
+    if (isAdmin) syncToCloud({ brands, services: newServices, settings });
   };
 
   const setSettings = (newSettings: AppSettings) => {
     _setSettings(newSettings);
-    if (isAdmin) syncToCloud({ brands, services, settings: newSettings, lastUpdated: new Date().toISOString() });
+    if (isAdmin) syncToCloud({ brands, services, settings: newSettings });
   };
 
   const login = (u: string, p: string): boolean => {
